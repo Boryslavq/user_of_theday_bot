@@ -3,6 +3,8 @@ from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.types import ParseMode
 
 from pkg.data import config
+from pkg.utils.db_api import database
+from pkg.utils.db_api.database import db
 
 
 async def on_startup(dispatcher: Dispatcher):
@@ -14,6 +16,9 @@ async def on_startup(dispatcher: Dispatcher):
     filters.setup(dp)
     handlers.users.setup(dp)
     handlers.errors.setup(dp)
+    await database.on_startup(dp)
+    await db.gino.create_all()
+    # await db.gino.drop_all()
 
 
 if __name__ == '__main__':
@@ -21,4 +26,4 @@ if __name__ == '__main__':
     storage = MemoryStorage()
     dp = Dispatcher(bot, storage=storage)
 
-    executor.start_polling(dp, on_startup=on_startup)
+    executor.start_polling(dp, on_startup=on_startup, skip_updates=True)
